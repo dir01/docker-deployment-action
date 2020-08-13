@@ -42,6 +42,11 @@ else
   INPUT_KEEP_FILES=$((INPUT_KEEP_FILES+1))
 fi
 
+if [ -z "$INPUT_ENV_FILE_NAME" ]; then
+  INPUT_ENV_FILE_NAME=.env
+fi
+
+
 STACK_FILE=${INPUT_STACK_FILE_NAME}
 DEPLOYMENT_COMMAND_OPTIONS=""
 
@@ -78,6 +83,10 @@ ssh-add "$HOME/.ssh/id_rsa"
 echo "Add known hosts"
 printf '%s %s\n' "$SSH_HOST" "$INPUT_SSH_PUBLIC_KEY" > /etc/ssh/ssh_known_hosts
 
+if ! [ -z "$INPUT_ENV_FILE_CONTENTS" ] ; then
+  printf '%s\n' "$INPUT_ENV_FILE_CONTENTS" > "$INPUT_ENV_FILE_NAME"
+fi
+
 if ! [ -z "$INPUT_DOCKER_PRUNE" ] && [ $INPUT_DOCKER_PRUNE = 'true' ] ; then
   yes | docker --log-level debug --host "ssh://$INPUT_REMOTE_DOCKER_HOST" system prune -a 2>&1
 fi
@@ -90,6 +99,13 @@ if ! [ -z "$INPUT_COPY_STACK_FILE" ] && [ $INPUT_COPY_STACK_FILE = 'true' ] ; th
       -o UserKnownHostsFile=/dev/null \
       -o StrictHostKeyChecking=no \
       $INPUT_STACK_FILE_NAME "$INPUT_REMOTE_DOCKER_HOST:$INPUT_DEPLOY_PATH/stacks/$FILE_NAME"
+  
+  if ! [ -z "$INPUT_ENV_FILE_CONTENTS" ] ; then
+      scp -i "$HOME/.ssh/id_rsa" \
+        -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        $INPUT_ENV_FILE_NAME "$INPUT_REMOTE_DOCKER_HOST:$INPUT_DEPLOY_PATH/$INPUT_ENV_FILE_NAME"
+  fi
 
   execute_ssh "ln -nfs $INPUT_DEPLOY_PATH/stacks/$FILE_NAME $INPUT_DEPLOY_PATH/$INPUT_STACK_FILE_NAME"
   execute_ssh "ls -t $INPUT_DEPLOY_PATH/stacks/docker-stack-* 2>/dev/null |  tail -n +$INPUT_KEEP_FILES | xargs rm --  2>/dev/null || true"

@@ -38,6 +38,12 @@ inputs:
   pull_images_first:
     description: Pull docker images before deploying.
     required: false
+  env_file_contents:
+    description: Contents of .env file to allow variable constitution in stack file
+    required: false
+  env_file_name:
+    description: Filename to put contents of `env_file_contents` to. Default is .env
+    required: false
 
 runs:
   using: docker

@@ -62,6 +62,10 @@ A boolean input to trigger docker prune command.
 The args for the pre deploument command. Applicable only for docker-compose.
 ### `pull_images_first`
 Pull docker images before deploying. Applicable only for docker-compose.
+### env_file_contents
+Contents of .env file. You might want to populate this one from github secret
+### env_file_name
+Filename of .env file. Should match an entry in `env_file` in your stack file. Default is .env
 
 ## License
 
