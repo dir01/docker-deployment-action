@@ -28,6 +28,10 @@ if [ -z "$INPUT_ARGS" ]; then
   exit 1
 fi
 
+if [ -z "$INPUT_DEPLOYMENT_MODE" ]; then
+  INPUT_DEPLOYMENT_MODE="docker-compose"
+fi
+
 if [ -z "$INPUT_DEPLOY_PATH" ]; then
   INPUT_DEPLOY_PATH=~/docker-deployment
 fi
@@ -63,7 +67,7 @@ case $INPUT_DEPLOYMENT_MODE in
     DEPLOYMENT_COMMAND="docker $DEPLOYMENT_COMMAND_OPTIONS stack deploy --compose-file $STACK_FILE"
   ;;
 
-  *)
+  docker-compose)
     DEPLOYMENT_COMMAND="docker-compose $DEPLOYMENT_COMMAND_OPTIONS -f $STACK_FILE"
   ;;
 esac
