@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -eux
 
 execute_ssh(){
   echo "Execute Over SSH: $@"
